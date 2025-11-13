@@ -1,0 +1,11 @@
+/* Custom styles from user's file */
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+.hero-bg {
+    /* Updated to use a real image from Unsplash */
+    background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://source.unsplash.com/1600x900/?city,delhi,noida');
+    background-size: cover;
+    background-position: center;
+}
