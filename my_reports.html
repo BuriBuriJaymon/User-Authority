@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Reports - FixYourCity</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .image-modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0, 0, 0, 0.75);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 100; padding: 1rem;
+        }
+        .image-modal-content {
+            position: relative; background: white; padding: 1rem;
+            border-radius: 0.5rem; max-width: 90vw; max-height: 90vh;
+        }
+        .image-modal-content img {
+            max-width: 100%; max-height: 85vh; display: block;
+        }
+        .image-modal-close {
+            position: absolute; top: -0.75rem; right: -0.75rem;
+            background: white; border: 2px solid #333; border-radius: 50%;
+            width: 2rem; height: 2rem; font-size: 1.25rem; font-weight: bold;
+            line-height: 1.75rem; text-align: center; cursor: pointer; color: #333;
+        }
+    </style>
+</head>
+<body class="bg-gray-50" data-page="my-reports">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="user_dashboard.html" class="font-bold text-2xl text-gray-800">FixYourCity</a>
+                </div>
+                <div>
+                    <a href="user_dashboard.html" class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition duration-300 font-medium">
+                        &larr; Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="issue-status" class="py-16 md:py-24 bg-gray-50">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-6">My Reports</h2>
+                <p class="text-center text-gray-600 mb-12 -mt-4 max-w-lg mx-auto">Here is a list of all the issues you have submitted *from this browser*.</p>
+                <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Date</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Category</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Location</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Status</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Evidence</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reports-tbody" class="bg-white divide-y divide-gray-200">
+                                <!-- Rows will be injected here by app.js -->
+                            </tbody>
+                        </table>
+                        <div id="no-reports-message" class="hidden text-center text-gray-600 p-8">
+                            <p>You have not reported any issues yet. <a href="user_dashboard.html" class="text-blue-600 hover:underline">Report one now!</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Image Modal -->
+    <div id="image-modal" class="image-modal-overlay hidden">
+        <div class="image-modal-content">
+            <button id="modal-close-btn" class="image-modal-close">&times;</button>
+            <img id="modal-image" src="" alt="Reported Issue Evidence" />
+        </div>
+    </div>
+    
+    <script src="app.js" defer></script>
+</body>
+</html>
