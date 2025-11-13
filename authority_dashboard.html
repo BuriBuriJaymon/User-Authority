@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authority Dashboard - Fix YourCity</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .hidden { display: none; }
+        .sidebar-link {
+            display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem; font-size: 0.875rem; font-weight: 500;
+            color: #d1fae5; transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+            text-decoration: none; cursor: pointer;
+        }
+        .sidebar-link:hover { background-color: #34d399; color: #ffffff; }
+        .sidebar-link.active { background-color: #34d399; color: #ffffff; }
+        #complaint-list { max-height: calc(100vh - 300px); overflow-y: auto; }
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); transition: transform 0.3s ease-in-out; }
+            .sidebar.open { transform: translateX(0); }
+        }
+    </style>
+</head>
+<body class="h-full" data-page="authority-dashboard">
+
+    <div class="min-h-full">
+        <!-- Sidebar -->
+        <nav class="sidebar fixed inset-y-0 left-0 z-30 flex w-64 flex-col overflow-y-auto bg-emerald-500 px-6 pb-4 md:flex md:transform-none">
+            <div class="flex h-16 shrink-0 items-center">
+                <h1 class="text-2xl font-bold text-white">Fix YourCity</h1>
+            </div>
+            <ul role="list" class="flex flex-1 flex-col gap-y-7">
+                <li>
+                    <ul role="list" class="-mx-2 space-y-1">
+                        <li>
+                            <a class="sidebar-link active" data-filter="All Reports">
+                                <!-- SVG for Dashboard -->
+                                <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.44 1.15-.44 1.59 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
+                                Dashboard
+                            </a>
+                        </li>
+                        <li>
+                            <a class="sidebar-link" data-filter="Pending">
+                                <!-- SVG for Pending -->
+                                <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                No Progress (Pending)
+                            </a>
+                        </li>
+                        <li>
+                            <a class="sidebar-link" data-filter="In Progress">
+                                <!-- SVG for In Progress -->
+                                <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>
+                                Active (In Progress)
+                            </a>
+                        </li>
+                        <li>
+                            <a class="sidebar-link" data-filter="Resolved">
+                                <!-- SVG for Resolved -->
+                                <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                Resolved
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <div class="text-xs font-semibold leading-6 text-emerald-100">Categories</div>
+                    <ul role="list" class="-mx-2 mt-2 space-y-1" id="category-filters">
+                        <li><a class="sidebar-link" data-filter="Pothole">Pothole</a></li>
+                        <li><a class="sidebar-link" data-filter="Broken Streetlight">Broken Streetlight</a></li>
+                        <li><a class="sidebar-link" data-filter="Garbage & Dumping">Garbage & Dumping</a></li>
+                        <li><a class="sidebar-link" data-filter="Public Nuisance">Public Nuisance</a></li>
+                        <li><a class="sidebar-link" data-filter="Graffiti">Graffiti</a></li>
+                        <li><a class="sidebar-link" data-filter="Other">Other</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content Area -->
+        <div class="md:pl-64">
+            <div class="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
+                <button type="button" class="text-gray-700 md:hidden" id="menu-toggle">
+                    <span class="sr-only">Open sidebar</span>
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>
+                </button>
+                <div class="flex-1 text-sm font-medium leading-6 text-gray-900" id="header-title">Dashboard</div>
+                <div>
+                    <a href="login.html" id="logout-btn" class="rounded-md bg-red-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-red-500">
+                        Log out
+                    </a>
+                </div>
+            </div>
+
+            <main class="py-10">
+                <div class="px-4 sm:px-6 lg:px-8">
+                    <h3 class="text-base font-semibold leading-6 text-gray-900">Key Statistics</h3>
+                    <div class="mt-2 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                        <div class="overflow-hidden rounded-lg bg-white shadow">
+                            <div class="p-5">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0">
+                                        <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 5.25h16.5" /></svg>
+                                    </div>
+                                    <div class="ml-5 w-0 flex-1">
+                                        <dl>
+                                            <dt class="truncate text-sm font-medium text-gray-500">Total Reports</dt>
+                                            <dd class="text-3xl font-semibold tracking-tight text-gray-900" id="stat-total">0</dd>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="overflow-hidden rounded-lg bg-white shadow">
+                            <div class="p-5">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0">
+                                        <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                    </div>
+                                    <div class="ml-5 w-0 flex-1">
+                                        <dl>
+                                            <dt class="truncate text-sm font-medium text-gray-500">Pending</dt>
+                                            <dd class="text-3xl font-semibold tracking-tight text-gray-900" id="stat-pending">0</dd>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="overflow-hidden rounded-lg bg-white shadow">
+                            <div class="p-5">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0">
+                                      <svg class="h-6 w-6 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                    </div>
+                                    <div class="ml-5 w-0 flex-1">
+                                        <dl>
+                                            <dt class="truncate text-sm font-medium text-gray-500">Resolved</dt>
+                                            <dd class="text-3xl font-semibold tracking-tight text-gray-900" id="stat-resolved">0</dd>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8">
+                        <h2 class="text-xl font-semibold leading-6 text-gray-900" id="complaint-list-title">All Reports</h2>
+                        <div class="mt-4 overflow-hidden rounded-lg bg-white shadow">
+                            <div class="p-6 space-y-6" id="complaint-list">
+                                <div id="empty-state" class="text-center text-gray-500 py-10">
+                                    <p>No reports found. Submit one from the user dashboard *in this browser* to see it here.</p>
+                                </div>
+                                <!-- Complaint cards will be injected here by app.js -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script src="app.js" defer></script>
+</body>
+</html>
