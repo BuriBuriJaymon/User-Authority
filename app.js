@@ -93,12 +93,12 @@ function startHeroSlideshow() {
     const slideshowContainer = document.getElementById('hero-slideshow');
     if (!slideshowContainer) return; // Guard clause if not on the right page
 
-    // --- UPDATED: Use user's uploaded images and remove Buddh Circuit ---
+    // --- UPDATED: Fixed filename for Humayun's Tomb ---
     const slidesData = [
         { img: 'IndiaGate.jpg', city: 'India Gate, Delhi' },
         { img: 'Lotus Temple.jpg', city: 'Lotus Temple, Delhi' },
         { img: 'Greater Noida Expressway.webp', city: 'Greater Noida Expressway' },
-        { img: 'Humayun\'s Tomb.jpg', city: 'Humayun\'s Tomb, Delhi' }
+        { img: 'humayuns-tomb.jpg', city: 'Humayun\'s Tomb, Delhi' } // <-- THE FIX IS HERE
     ];
     // --- End of Update ---
 
@@ -180,7 +180,7 @@ function initUserDashboard() {
             getLocationBtn.disabled = true;
             getLocationBtn.textContent = 'Fetching...';
             locationFeedback.textContent = 'Requesting location permission...';
-            locationFeedback.className = 'text-sm text-blue-600 mt-2';
+            locationFoodback.className = 'text-sm text-blue-600 mt-2';
 
             navigator.geolocation.getCurrentPosition(
                 (position) => {
@@ -315,7 +315,7 @@ function initMyReports() {
         // --- Create Location HTML with Map Link ---
         let locationHtml = issue.location;
         if (issue.geolocation && issue.geolocation.lat) {
-            locationHtml += ` <a href="https://www.google.com/maps?q=${issue.geolocation.lat},${issue.geolocation.lon}" target="_blank" class="text-blue-600 hover:underline text-xs block">(View Map)</a>`;
+            locationHtml += ` <a href="http://googleusercontent.com/maps/google.com/0{issue.geolocation.lat},${issue.geolocation.lon}" target="_blank" class="text-blue-600 hover:underline text-xs block">(View Map)</a>`;
         }
         // ------------------------------------------
 
@@ -326,7 +326,7 @@ function initMyReports() {
             <td class="px-6 py-4 whitespace-nowrap">
                 <span class="${statusClasses}">${issue.status}</span>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+            <td classpx-6 py-4 whitespace-nowrap text-sm font-medium">
                 <button class="view-image-btn text-blue-600 hover:text-blue-800 hover:underline text-sm font-medium" data-src="${issue.imageData}">View</button>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -454,7 +454,7 @@ function initAuthorityDashboard() {
                     <p><strong>Location:</strong> ${report.location || 'Not specified'}</p>
                     
                     ${report.geolocation && report.geolocation.lat ? `
-                        <a href="https://www.google.com/maps?q=${report.geolocation.lat},${report.geolocation.lon}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline text-sm font-medium mt-1 inline-block">
+                        <a href="http://googleusercontent.com/maps/google.com/0{report.geolocation.lat},${report.geolocation.lon}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline text-sm font-medium mt-1 inline-block">
                             View on Map
                         </a>`
                     : ''}
@@ -556,7 +556,7 @@ function initExplore() {
         
         let locationHtml = report.location;
         if (report.geolocation && report.geolocation.lat) {
-            locationHtml += ` <a href="https://www.google.com/maps?q=${report.geolocation.lat},${report.geolocation.lon}" target="_blank" class="text-blue-600 hover:underline text-xs block">(View Map)</a>`;
+            locationHtml += ` <a href="http://googleusercontent.com/maps/google.com/0{report.geolocation.lat},${report.geolocation.lon}" target="_blank" class="text-blue-600 hover:underline text-xs block">(View Map)</a>`;
         }
 
         card.innerHTML = `
