@@ -93,13 +93,15 @@ function startHeroSlideshow() {
     const slideshowContainer = document.getElementById('hero-slideshow');
     if (!slideshowContainer) return; // Guard clause if not on the right page
 
+    // --- UPDATED: New aesthetic images for Delhi & Greater Noida ---
     const slidesData = [
-        { img: 'https://source.unsplash.com/1600x900/?delhi,clean,road', city: 'Delhi' },
-        { img: 'https://source.unsplash.com/1600x900/?greater,noida,clean,road', city: 'Greater Noida' },
-        { img: 'https://source.unsplash.com/1600x900/?delhi,street,clean', city: 'Delhi' },
-        { img: 'https://source.unsplash.com/1600x900/?noida,wide,road,clean', city: 'Greater Noida' },
-        { img: 'https://source.unsplash.com/1600x900/?delhi,traffic,clean,road', city: 'Delhi' }
+        { img: 'https://images.pexels.com/photos/792026/pexels-photo-792026.jpeg', city: 'India Gate, Delhi' },
+        { img: 'https://images.pexels.com/photos/16036137/pexels-photo-16036137/free-photo-of-buddh-international-circuit.jpeg', city: 'Greater Noida' },
+        { img: 'https://images.pexels.com/photos/931007/pexels-photo-931007.jpeg', city: 'Lotus Temple, Delhi' },
+        { img: 'https://images.pexels.com/photos/14022262/pexels-photo-14022262.jpeg', city: 'Greater Noida Expressway' },
+        { img: 'https://images.pexels.com/photos/1117493/pexels-photo-1117493.jpeg', city: 'Humayun\'s Tomb, Delhi' }
     ];
+    // --- End of Update ---
 
     // Create and append slide elements
     slidesData.forEach((slide) => {
