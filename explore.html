@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explore Issues - FixYourCity</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-50" data-page="explore">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="user_dashboard.html" class="font-bold text-2xl text-gray-800">FixYourCity</a>
+                </div>
+                <div class="flex items-center space-x-8">
+                    <a href="#" class="text-gray-600 hover:text-blue-600 font-medium open-report-modal">Report an Issue</a>
+                    <a href="my_reports.html" class="text-gray-600 hover:text-blue-600 font-medium nav-link">My Reports</a>
+                    <a href="explore.html" class="nav-link nav-link-active">Explore Issues</a>
+                    <a href="user_dashboard.html#how-it-works" class="text-gray-600 hover:text-blue-600 font-medium nav-link">How It Works</a>
+                    <a href="index.html" id="logout-btn" class="bg-red-500 text-white px-4 py-2 rounded-lg shadow hover:bg-red-600 transition duration-300 font-medium">Logout</a> 
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="py-16 md:py-24 bg-gray-50">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-12">Explore All Submitted Issues</h2>
+
+                <div class="mb-12">
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-6 border-b-2 border-red-300 pb-2">
+                        Active (no operation)
+                    </h3>
+                    <div id="pending-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        </div>
+                    <div id="pending-empty" class="hidden text-center text-gray-600 p-8 bg-white rounded-lg shadow">
+                        <p>No active issues found.</p>
+                    </div>
+                </div>
+
+                <div class="mb-12">
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-6 border-b-2 border-yellow-400 pb-2">
+                        Under Process
+                    </h3>
+                    <div id="in-progress-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        </div>
+                    <div id="in-progress-empty" class="hidden text-center text-gray-600 p-8 bg-white rounded-lg shadow">
+                        <p>No issues are currently under process.</p>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-6 border-b-2 border-green-400 pb-2">
+                        Resolved
+                    </h3>
+                    <div id="resolved-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        </div>
+                    <div id="resolved-empty" class="hidden text-center text-gray-600 p-8 bg-white rounded-lg shadow">
+                        <p>No issues have been resolved yet.</p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+    
+    <footer class="bg-gray-800 text-gray-300">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
+            <p>&copy; 2025 FixYourCity. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <div id="report-modal" class="fixed inset-0 bg-gray-600 bg-opacity-75 overflow-y-auto h-full w-full flex items-center justify-center z-50 hidden">
+        <div class="relative mx-auto p-5 border w-full max-w-lg shadow-lg rounded-xl bg-white">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-2xl font-semibold text-gray-800">Report a New Issue</h3>
+                <button id="close-modal-btn" class="text-gray-500 hover:text-gray-800">
+                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <form id="report-form" class="space-y-4">
+                <div>
+                    <label for="issue-category" class="block text-sm font-medium text-gray-700 mb-1">Issue Category</label>
+                    <select id="issue-category" name="category" required class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">Select a category</option>
+                        <option value="Pothole">Pothole</option>
+                        <option value="Garbage & Dumping">Garbage & Illegal Dumping</option>
+                        <option value="Broken Streetlight">Broken Streetlight</option>
+                        <option value="Public Nuisance">Public Nuisance</option>
+                        <option value="Graffiti">Graffiti</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="location" class="block text-sm font-medium text-gray-700 mb-1">Location / Address</label>
+                    <input type="text" id="location" name="location" required placeholder="e.g., Near Sector 18 Metro, Noida" class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <textarea id="description" name="description" rows="3" placeholder="Provide a brief description of the issue..." class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                </div>
+                <div>
+                    <label for="photo-upload" class="block text-sm font-medium text-gray-700 mb-1">Add Photo Evidence</label>
+                    <input type="file" id="photo-upload" name="photo" accept="image/*" required class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
+                </div>
+                <div id="form-message" class="hidden p-3 rounded-lg text-sm"></div>
+                <div class="pt-4">
+                    <button type="submit" id="submit-report-btn" class="w-full bg-blue-600 text-white px-4 py-3 rounded-lg shadow hover:bg-blue-700 transition duration-300 font-medium">
+                        Submit Report
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="image-modal" class="image-modal-overlay hidden">
+        <div class="image-modal-content">
+            <button id="modal-close-btn" class="image-modal-close">&times;</button>
+            <img id="modal-image" src="" alt="Reported Issue Evidence" />
+        </div>
+    </div>
+    
+    <script src="app.js" defer></script>
+</body>
+</html>
