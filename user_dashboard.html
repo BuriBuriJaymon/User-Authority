@@ -18,12 +18,33 @@
                 <div class="flex-shrink-0 flex items-center">
                     <a href="user_dashboard.html" class="font-bold text-2xl text-gray-800">FixYourCity</a>
                 </div>
-                <div class="flex items-center space-x-8">
+                
+                <!-- Desktop Nav -->
+                <div class="hidden md:flex items-center space-x-8">
                     <a href="#" class="text-gray-600 hover:text-blue-600 font-medium open-report-modal">Report an Issue</a>
                     <a href="my_reports.html" class="text-gray-600 hover:text-blue-600 font-medium">My Reports</a>
                     <a href="explore.html" class="text-gray-600 hover:text-blue-600 font-medium nav-link">Explore Issues</a>
                     <a href="#how-it-works" class="text-gray-600 hover:text-blue-600 font-medium">How It Works</a>
-                    <a href="index.html" id="logout-btn" class="bg-red-500 text-white px-4 py-2 rounded-lg shadow hover:bg-red-600 transition duration-300 font-medium">Logout</a> </div>
+                    <a href="index.html" id="logout-btn" class="bg-red-500 text-white px-4 py-2 rounded-lg shadow hover:bg-red-600 transition duration-300 font-medium">Logout</a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-btn" class="text-gray-700 hover:text-gray-900 focus:outline-none">
+                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16m-7 6h7" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="hidden md:hidden pb-4">
+                <a href="#" class="block px-2 py-2 text-gray-600 hover:text-blue-600 font-medium open-report-modal">Report an Issue</a>
+                <a href="my_reports.html" class="block px-2 py-2 text-gray-600 hover:text-blue-600 font-medium">My Reports</a>
+                <a href="explore.html" class="block px-2 py-2 text-gray-600 hover:text-blue-600 font-medium nav-link">Explore Issues</a>
+                <a href="#how-it-works" class="block px-2 py-2 text-gray-600 hover:text-blue-600 font-medium">How It Works</a>
+                <a href="index.html" id="logout-btn-mobile" class="block px-2 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition duration-300 font-medium mt-2">Logout</a>
             </div>
         </nav>
     </header>
@@ -93,7 +114,7 @@
         </div>
     </footer>
     
-    <div id="report-modal" class="fixed inset-0 bg-gray-600 bg-opacity-75 overflow-y-auto h-full w-full flex items-center justify-center z-50 hidden">
+    <div id="report-modal" class="fixed inset-0 bg-gray-600 bg-opacity-75 overflow-y-auto h-full w-full flex items-center justify-center z-50 hidden p-4">
         <div class="relative mx-auto p-5 border w-full max-w-lg shadow-lg rounded-xl bg-white">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-2xl font-semibold text-gray-800">Report a New Issue</h3>
