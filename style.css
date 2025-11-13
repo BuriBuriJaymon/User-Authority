@@ -9,3 +9,48 @@ body {
     background-size: cover;
     background-position: center;
 }
+
+/* Style for the active navigation link */
+.nav-link {
+    color: #4B5563; /* gray-600 */
+}
+.nav-link-active {
+    color: #2563EB; /* blue-600 */
+    font-weight: 600; /* semibold */
+}
+
+/* Styles for the new Explore page cards */
+.explore-image-thumb {
+    width: 100%;
+    height: 200px; /* Fixed height for consistency */
+    object-fit: cover; /* Crop image to fit */
+    cursor: pointer;
+    transition: opacity 0.3s;
+}
+.explore-image-thumb:hover {
+    opacity: 0.8;
+}
+
+/*
+ * Styles for the Image Modal
+ * Moved from my_reports.html and explore.html for centralization
+*/
+.image-modal-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0, 0, 0, 0.75);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 100; padding: 1rem;
+}
+.image-modal-content {
+    position: relative; background: white; padding: 1rem;
+    border-radius: 0.5rem; max-width: 90vw; max-height: 90vh;
+}
+.image-modal-content img {
+    max-width: 100%; max-height: 85vh; display: block;
+}
+.image-modal-close {
+    position: absolute; top: -0.75rem; right: -0.75rem;
+    background: white; border: 2px solid #333; border-radius: 50%;
+    width: 2rem; height: 2rem; font-size: 1.25rem; font-weight: bold;
+    line-height: 1.75rem; text-align: center; cursor: pointer; color: #333;
+}
