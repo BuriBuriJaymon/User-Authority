@@ -85,10 +85,56 @@ function getStatusClass(status) {
     }
 }
 
+// --- NEW SLIDESHOW FUNCTION ---
+/**
+ * Initializes and starts the hero slideshow on the user dashboard.
+ */
+function startHeroSlideshow() {
+    const slideshowContainer = document.getElementById('hero-slideshow');
+    if (!slideshowContainer) return; // Guard clause if not on the right page
+
+    const slidesData = [
+        { img: 'https://source.unsplash.com/1600x900/?delhi,clean,road', city: 'Delhi' },
+        { img: 'https://source.unsplash.com/1600x900/?greater,noida,clean,road', city: 'Greater Noida' },
+        { img: 'https://source.unsplash.com/1600x900/?delhi,street,clean', city: 'Delhi' },
+        { img: 'https://source.unsplash.com/1600x900/?noida,wide,road,clean', city: 'Greater Noida' },
+        { img: 'https://source.unsplash.com/1600x900/?delhi,traffic,clean,road', city: 'Delhi' }
+    ];
+
+    // Create and append slide elements
+    slidesData.forEach((slide) => {
+        const slideEl = document.createElement('div');
+        slideEl.className = 'hero-slide';
+        // Use 'url' with quotes inside parentheses for safety
+        slideEl.style.backgroundImage = `url('${slide.img}')`;
+
+        const cityEl = document.createElement('div');
+        cityEl.className = 'slide-city-name';
+        cityEl.textContent = slide.city;
+
+        slideEl.appendChild(cityEl);
+        slideshowContainer.appendChild(slideEl);
+    });
+
+    // Start the slideshow logic
+    const slides = slideshowContainer.querySelectorAll('.hero-slide');
+    if (slides.length === 0) return;
+
+    let currentSlide = 0;
+    slides[currentSlide].classList.add('active');
+
+    setInterval(() => {
+        slides[currentSlide].classList.remove('active');
+        currentSlide = (currentSlide + 1) % slides.length;
+        slides[currentSlide].classList.add('active');
+    }, 5000); // Change slide every 5 seconds
+}
+
+
 // --- Page Initializers ---
 
 /**
- * Sets up the User Dashboard page (index.html).
+ * Sets up the User Dashboard page (user_dashboard.html).
  */
 function initUserDashboard() {
     const modal = document.getElementById('report-modal');
@@ -109,8 +155,10 @@ function initUserDashboard() {
         modal.classList.add('hidden');
         // Clear any previous messages
         formMessage.classList.add('hidden');
-        locationFeedback.textContent = '';
-        locationFeedback.className = 'text-sm text-gray-600 mt-2';
+        if (locationFeedback) { // Check if location feedback exists
+            locationFeedback.textContent = '';
+            locationFeedback.className = 'text-sm text-gray-600 mt-2';
+        }
     };
 
     openModalBtns.forEach(btn => btn.addEventListener('click', openModal));
@@ -119,51 +167,53 @@ function initUserDashboard() {
         if (e.target === modal) closeModal();
     });
 
-    // --- Geolocation Button Handler ---
-    getLocationBtn.addEventListener('click', () => {
-        if (!navigator.geolocation) {
-            locationFeedback.textContent = 'Geolocation is not supported by your browser.';
-            locationFeedback.className = 'text-sm text-red-600 mt-2';
-            return;
-        }
-
-        getLocationBtn.disabled = true;
-        getLocationBtn.textContent = 'Fetching...';
-        locationFeedback.textContent = 'Requesting location permission...';
-        locationFeedback.className = 'text-sm text-blue-600 mt-2';
-
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                capturedCoords = {
-                    lat: position.coords.latitude,
-                    lon: position.coords.longitude
-                };
-                locationFeedback.textContent = `Location captured: ${position.coords.latitude.toFixed(5)}, ${position.coords.longitude.toFixed(5)}`;
-                locationFeedback.className = 'text-sm text-green-600 mt-2';
-                getLocationBtn.disabled = false;
-                getLocationBtn.textContent = 'Get My Current Location';
-            },
-            (error) => {
-                let errorMsg = 'Unable to retrieve location.';
-                switch(error.code) {
-                    case error.PERMISSION_DENIED:
-                        errorMsg = 'Location permission denied. Please enable it in your browser settings.';
-                        break;
-                    case error.POSITION_UNAVAILABLE:
-                        errorMsg = 'Location information is unavailable.';
-                        break;
-                    case error.TIMEOUT:
-                        errorMsg = 'The request to get location timed out.';
-                        break;
-                }
-                locationFeedback.textContent = errorMsg;
+    // --- Geolocation Button Handler (if button exists) ---
+    if (getLocationBtn) {
+        getLocationBtn.addEventListener('click', () => {
+            if (!navigator.geolocation) {
+                locationFeedback.textContent = 'Geolocation is not supported by your browser.';
                 locationFeedback.className = 'text-sm text-red-600 mt-2';
-                capturedCoords = null;
-                getLocationBtn.disabled = false;
-                getLocationBtn.textContent = 'Get My Current Location';
+                return;
             }
-        );
-    });
+
+            getLocationBtn.disabled = true;
+            getLocationBtn.textContent = 'Fetching...';
+            locationFeedback.textContent = 'Requesting location permission...';
+            locationFeedback.className = 'text-sm text-blue-600 mt-2';
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    capturedCoords = {
+                        lat: position.coords.latitude,
+                        lon: position.coords.longitude
+                    };
+                    locationFeedback.textContent = `Location captured: ${position.coords.latitude.toFixed(5)}, ${position.coords.longitude.toFixed(5)}`;
+                    locationFeedback.className = 'text-sm text-green-600 mt-2';
+                    getLocationBtn.disabled = false;
+                    getLocationBtn.textContent = 'Get My Current Location';
+                },
+                (error) => {
+                    let errorMsg = 'Unable to retrieve location.';
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMsg = 'Location permission denied. Please enable it in your browser settings.';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMsg = 'Location information is unavailable.';
+                            break;
+                        case error.TIMEOUT:
+                            errorMsg = 'The request to get location timed out.';
+                            break;
+                    }
+                    locationFeedback.textContent = errorMsg;
+                    locationFeedback.className = 'text-sm text-red-600 mt-2';
+                    capturedCoords = null;
+                    getLocationBtn.disabled = false;
+                    getLocationBtn.textContent = 'Get My Current Location';
+                }
+            );
+        });
+    }
     // ----------------------------------
 
     form.addEventListener('submit', async (e) => {
@@ -207,8 +257,10 @@ function initUserDashboard() {
             submitBtn.textContent = 'Submit Report';
             form.reset();
             capturedCoords = null; // Reset coords
-            locationFeedback.textContent = ''; // Reset feedback
-            locationFeedback.className = 'text-sm text-gray-600 mt-2';
+            if (locationFeedback) { // Reset feedback
+                locationFeedback.textContent = ''; 
+                locationFeedback.className = 'text-sm text-gray-600 mt-2';
+            }
 
             setTimeout(() => {
                 closeModal();
@@ -222,6 +274,10 @@ function initUserDashboard() {
             submitBtn.textContent = 'Submit Report';
         }
     });
+
+    // --- START THE SLIDESHOW ---
+    // This is called at the end of the user dashboard init
+    startHeroSlideshow();
 }
 
 /**
@@ -230,6 +286,13 @@ function initUserDashboard() {
 function initMyReports() {
     const tableBody = document.getElementById('reports-tbody');
     const noReportsMsg = document.getElementById('no-reports-message');
+    
+    // Guard clauses for elements
+    if (!tableBody || !noReportsMsg) {
+        console.error("Could not find 'My Reports' table elements.");
+        return;
+    }
+    
     const reports = getReports();
 
     if (reports.length === 0) {
@@ -314,12 +377,19 @@ function initAuthorityDashboard() {
     const statPendingEl = document.getElementById('stat-pending');
     const statResolvedEl = document.getElementById('stat-resolved');
     const complaintListEl = document.getElementById('complaint-list');
-    const emptyStateEl = document.getElementById('empty-state');
     const headerTitleEl = document.getElementById('header-title');
     const complaintListTitleEl = document.getElementById('complaint-list-title');
     const sidebarLinks = document.querySelectorAll('.sidebar-link');
     const menuToggle = document.getElementById('menu-toggle');
     const sidebar = document.querySelector('.sidebar');
+    
+    // --- FIX for Empty State ---
+    const emptyStateEl = document.getElementById('empty-state');
+    const emptyStateHTML = emptyStateEl ? emptyStateEl.outerHTML : '<div class="text-center text-gray-500 py-10"><p>No reports found.</p></div>';
+    if (emptyStateEl) {
+        emptyStateEl.remove(); // Remove original from list
+    }
+    // ---------------------------
 
     function updateStatistics() {
         statTotalEl.textContent = allReports.length;
@@ -344,7 +414,7 @@ function initAuthorityDashboard() {
         filteredReports.sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
 
         if (filteredReports.length === 0) {
-            complaintListEl.appendChild(emptyStateEl);
+            complaintListEl.innerHTML = emptyStateHTML; // <-- FIX: Use cached HTML
             return;
         }
 
@@ -362,12 +432,12 @@ function initAuthorityDashboard() {
         const statusClasses = `px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClass(report.status)}`;
 
         card.innerHTML = `
-            <div class="flex items-center justify-between">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                 <div class="flex items-center gap-x-3">
                     <span class="font-semibold text-gray-800">${report.category}</span>
                     <span class="${statusClasses}">${report.status}</span>
                 </div>
-                <div class="text-sm text-gray-500">
+                <div class="text-sm text-gray-500 mt-2 sm:mt-0">
                     Reported on: ${formattedDate}
                 </div>
             </div>
@@ -375,10 +445,10 @@ function initAuthorityDashboard() {
             <p class="mt-4 text-gray-700">${report.description || 'No description provided.'}</p>
             
             <a href="${report.imageData}" target="_blank" rel="noopener noreferrer">
-                <img src="${report.imageData}" alt="Evidence" style="width: 200px; margin-top: 10px; border-radius: 8px; cursor: pointer;">
+                <img src="${report.imageData}" alt="Evidence" class="mt-4 rounded-lg shadow-md max-w-xs cursor-pointer hover:opacity-80 transition-opacity">
             </a>
             
-            <div class="mt-4 flex items-center justify-between">
+            <div class="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between">
                 <div class="text-sm text-gray-600">
                     <p><strong>Location:</strong> ${report.location || 'Not specified'}</p>
                     
@@ -389,7 +459,7 @@ function initAuthorityDashboard() {
                     : ''}
                     </div>
                 
-                <div class="flex-shrink-0 space-x-2">
+                <div class="flex-shrink-0 space-x-2 mt-4 sm:mt-0">
                     ${report.status === 'Pending' ? `
                         <button data-id="${report.id}" data-status="In Progress" class="status-btn rounded-md bg-emerald-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500">
                             Mark In Progress
@@ -451,18 +521,151 @@ function initAuthorityDashboard() {
 }
 
 /**
- * Sets up common functionality, like logout.
+ * Sets up the "Explore Issues" page.
+ */
+function initExplore() {
+    const reports = getReports();
+
+    // Get list containers
+    const pendingList = document.getElementById('pending-list');
+    const inProgressList = document.getElementById('in-progress-list');
+    const resolvedList = document.getElementById('resolved-list');
+
+    // Get empty state messages
+    const pendingEmpty = document.getElementById('pending-empty');
+    const inProgressEmpty = document.getElementById('in-progress-empty');
+    const resolvedEmpty = document.getElementById('resolved-empty');
+
+    // Guard clauses for elements
+    if (!pendingList || !inProgressList || !resolvedList || !pendingEmpty || !inProgressEmpty || !resolvedEmpty) {
+        console.error('Could not find all elements on Explore page.');
+        return;
+    }
+
+    // Filter reports
+    const pendingReports = reports.filter(r => r.status === 'Pending').sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+    const inProgressReports = reports.filter(r => r.status === 'In Progress').sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+    const resolvedReports = reports.filter(r => r.status === 'Resolved').sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+
+    // Helper to create a card
+    const createExploreCard = (report) => {
+        const card = document.createElement('div');
+        card.className = 'bg-white shadow-lg rounded-lg overflow-hidden';
+        const submittedDate = new Date(report.submittedAt).toLocaleDateString('en-IN');
+        
+        let locationHtml = report.location;
+        if (report.geolocation && report.geolocation.lat) {
+            locationHtml += ` <a href="https://www.google.com/maps?q=${report.geolocation.lat},${report.geolocation.lon}" target="_blank" class="text-blue-600 hover:underline text-xs block">(View Map)</a>`;
+        }
+
+        card.innerHTML = `
+            <img src="${report.imageData}" alt="Evidence" class="explore-image-thumb view-image-btn" data-src="${report.imageData}">
+            <div class="p-4">
+                <h4 class="text-lg font-semibold text-gray-800">${report.category}</h4>
+                <p class="text-sm text-gray-600 mt-1 truncate">${locationHtml}</p>
+                <p class="text-sm text-gray-700 mt-2 h-10 overflow-hidden text-ellipsis">${report.description || 'No description provided.'}</p>
+                <p class="text-xs text-gray-500 mt-3">Reported on: ${submittedDate}</p>
+            </div>
+        `;
+        return card;
+    };
+
+    // Populate Pending
+    if (pendingReports.length > 0) {
+        pendingList.innerHTML = ''; // Clear just in case
+        pendingReports.forEach(r => pendingList.appendChild(createExploreCard(r)));
+    } else {
+        pendingEmpty.classList.remove('hidden');
+    }
+
+    // Populate In Progress
+    if (inProgressReports.length > 0) {
+        inProgressList.innerHTML = ''; // Clear
+        inProgressReports.forEach(r => inProgressList.appendChild(createExploreCard(r)));
+    } else {
+        inProgressEmpty.classList.remove('hidden');
+    }
+
+    // Populate Resolved
+    if (resolvedReports.length > 0) {
+        resolvedList.innerHTML = ''; // Clear
+        resolvedReports.forEach(r => resolvedList.appendChild(createExploreCard(r)));
+    } else {
+        resolvedEmpty.classList.remove('hidden');
+    }
+
+    // --- Modal Logic (Copied from My Reports) ---
+    const imageModal = document.getElementById('image-modal');
+    const modalImage = document.getElementById('modal-image');
+    const modalCloseBtn = document.getElementById('modal-close-btn');
+
+    // Ensure modal elements exist
+    if (!imageModal || !modalImage || !modalCloseBtn) {
+        console.error('Could not find image modal elements on Explore page.');
+        return;
+    }
+
+    const openModal = (imageUrl) => {
+        modalImage.src = imageUrl;
+        imageModal.classList.remove('hidden');
+    };
+    const closeModal = () => {
+        imageModal.classList.add('hidden');
+        modalImage.src = ''; 
+    };
+
+    modalCloseBtn.addEventListener('click', closeModal);
+    imageModal.addEventListener('click', (e) => {
+        if (e.target === imageModal) closeModal();
+    });
+
+    // Add event listener to the main container
+    document.querySelector('main').addEventListener('click', (e) => {
+        if (e.target.classList.contains('view-image-btn')) {
+            openModal(e.target.dataset.src);
+        }
+    });
+}
+
+
+/**
+ * Sets up common functionality, like logout and modal opening.
  */
 function initCommon() {
+    // Logout functionality
     document.querySelectorAll('#logout-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
             // We just clear the userType. We'll leave the reports
             // so the "authority" can see them.
             localStorage.removeItem('userType');
-            window.location.href = 'index.html'; // <-- UPDATED
+            window.location.href = 'index.html';
         });
     });
+
+    // Common modal functionality (for nav links)
+    // This assumes the modal exists on every page it's linked from
+    const modal = document.getElementById('report-modal');
+    if (modal) { // Only run if modal exists on the page
+        const openModalBtns = document.querySelectorAll('.open-report-modal');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+
+        const openModal = () => modal.classList.remove('hidden');
+        const closeModal = () => modal.classList.add('hidden');
+
+        openModalBtns.forEach(btn => btn.addEventListener('click', (e) => {
+            e.preventDefault(); // Prevent hash link
+            openModal();
+        }));
+        
+        if (closeModalBtn) {
+            closeModalBtn.addEventListener('click', closeModal);
+        }
+        
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+    }
 }
 
 // --- Main Execution ---
@@ -475,6 +678,8 @@ document.addEventListener('DOMContentLoaded', () => {
         initMyReports();
     } else if (page === 'authority-dashboard') {
         initAuthorityDashboard();
+    } else if (page === 'explore') { // <-- FIX: Added explore page init
+        initExplore();
     }
 
     // Run common setup on all pages
