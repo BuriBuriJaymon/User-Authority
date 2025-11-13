@@ -85,33 +85,86 @@ function getStatusClass(status) {
     }
 }
 
-// --- Shared UI Functions ---
+// --- Page Initializers ---
 
 /**
- * Initializes the "Report an Issue" modal functionality.
- * This is now shared across multiple pages.
+ * Sets up the User Dashboard page (index.html).
  */
-function initReportModal() {
+function initUserDashboard() {
     const modal = document.getElementById('report-modal');
-    if (!modal) return; // Exit if modal isn't on the page
-
     const form = document.getElementById('report-form');
     const openModalBtns = document.querySelectorAll('.open-report-modal');
     const closeModalBtn = document.getElementById('close-modal-btn');
     const submitBtn = document.getElementById('submit-report-btn');
     const formMessage = document.getElementById('form-message');
 
-    const openModal = (e) => {
-        e.preventDefault(); // Prevent default link behavior
-        modal.classList.remove('hidden');
+    // --- Geolocation Elements ---
+    const getLocationBtn = document.getElementById('get-location-btn');
+    const locationFeedback = document.getElementById('location-feedback');
+    let capturedCoords = null;
+    // ----------------------------
+
+    const openModal = () => modal.classList.remove('hidden');
+    const closeModal = () => {
+        modal.classList.add('hidden');
+        // Clear any previous messages
+        formMessage.classList.add('hidden');
+        locationFeedback.textContent = '';
+        locationFeedback.className = 'text-sm text-gray-600 mt-2';
     };
-    const closeModal = () => modal.classList.add('hidden');
 
     openModalBtns.forEach(btn => btn.addEventListener('click', openModal));
     closeModalBtn.addEventListener('click', closeModal);
     modal.addEventListener('click', (e) => {
         if (e.target === modal) closeModal();
     });
+
+    // --- Geolocation Button Handler ---
+    getLocationBtn.addEventListener('click', () => {
+        if (!navigator.geolocation) {
+            locationFeedback.textContent = 'Geolocation is not supported by your browser.';
+            locationFeedback.className = 'text-sm text-red-600 mt-2';
+            return;
+        }
+
+        getLocationBtn.disabled = true;
+        getLocationBtn.textContent = 'Fetching...';
+        locationFeedback.textContent = 'Requesting location permission...';
+        locationFeedback.className = 'text-sm text-blue-600 mt-2';
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                capturedCoords = {
+                    lat: position.coords.latitude,
+                    lon: position.coords.longitude
+                };
+                locationFeedback.textContent = `Location captured: ${position.coords.latitude.toFixed(5)}, ${position.coords.longitude.toFixed(5)}`;
+                locationFeedback.className = 'text-sm text-green-600 mt-2';
+                getLocationBtn.disabled = false;
+                getLocationBtn.textContent = 'Get My Current Location';
+            },
+            (error) => {
+                let errorMsg = 'Unable to retrieve location.';
+                switch(error.code) {
+                    case error.PERMISSION_DENIED:
+                        errorMsg = 'Location permission denied. Please enable it in your browser settings.';
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        errorMsg = 'Location information is unavailable.';
+                        break;
+                    case error.TIMEOUT:
+                        errorMsg = 'The request to get location timed out.';
+                        break;
+                }
+                locationFeedback.textContent = errorMsg;
+                locationFeedback.className = 'text-sm text-red-600 mt-2';
+                capturedCoords = null;
+                getLocationBtn.disabled = false;
+                getLocationBtn.textContent = 'Get My Current Location';
+            }
+        );
+    });
+    // ----------------------------------
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -129,6 +182,7 @@ function initReportModal() {
                 throw new Error('Please fill out all required fields and add a photo.');
             }
 
+            // Read the image file as a Data URL to store in localStorage
             const imageData = await readImageAsDataURL(photoFile);
 
             const newReport = {
@@ -136,13 +190,15 @@ function initReportModal() {
                 category,
                 location,
                 description,
-                imageData,
+                imageData, // Store the base64 string
+                geolocation: capturedCoords, // <-- ADDED GEOLOCATION
                 status: 'Pending',
                 submittedAt: new Date().toISOString(),
             };
 
             addReport(newReport);
 
+            // Show success message
             formMessage.textContent = 'Report submitted successfully!';
             formMessage.className = 'p-3 rounded-lg text-sm bg-green-100 text-green-800';
             formMessage.classList.remove('hidden');
@@ -150,14 +206,12 @@ function initReportModal() {
             submitBtn.disabled = false;
             submitBtn.textContent = 'Submit Report';
             form.reset();
+            capturedCoords = null; // Reset coords
+            locationFeedback.textContent = ''; // Reset feedback
+            locationFeedback.className = 'text-sm text-gray-600 mt-2';
 
             setTimeout(() => {
                 closeModal();
-                formMessage.classList.add('hidden');
-                // If we're on the explore page, refresh it to show the new report
-                if (document.body.dataset.page === 'explore') {
-                    initExplorePage();
-                }
             }, 2000);
 
         } catch (error) {
@@ -171,13 +225,55 @@ function initReportModal() {
 }
 
 /**
- * Initializes the image popup modal.
- * Shared by My Reports and Explore Issues pages.
+ * Sets up the "My Reports" page.
  */
-function initImageModal() {
-    const imageModal = document.getElementById('image-modal');
-    if (!imageModal) return;
+function initMyReports() {
+    const tableBody = document.getElementById('reports-tbody');
+    const noReportsMsg = document.getElementById('no-reports-message');
+    const reports = getReports();
 
+    if (reports.length === 0) {
+        noReportsMsg.classList.remove('hidden');
+        return;
+    }
+
+    tableBody.innerHTML = ''; // Clear table
+    reports.forEach(issue => {
+        const row = document.createElement('tr');
+        const statusClasses = `px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClass(issue.status)}`;
+        const submittedDate = new Date(issue.submittedAt).toLocaleDateString('en-IN');
+        
+        let actionButton = '';
+        if (issue.status === 'Resolved') {
+            actionButton = `<button class="reopen-btn text-blue-600 hover:text-blue-800 hover:underline text-sm font-medium" data-id="${issue.id}">Reopen</button>`;
+        }
+
+        // --- Create Location HTML with Map Link ---
+        let locationHtml = issue.location;
+        if (issue.geolocation && issue.geolocation.lat) {
+            locationHtml += ` <a href="https://www.google.com/maps?q=${issue.geolocation.lat},${issue.geolocation.lon}" target="_blank" class="text-blue-600 hover:underline text-xs block">(View Map)</a>`;
+        }
+        // ------------------------------------------
+
+        row.innerHTML = `
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${submittedDate}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${issue.category}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${locationHtml}</td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                <span class="${statusClasses}">${issue.status}</span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                <button class="view-image-btn text-blue-600 hover:text-blue-800 hover:underline text-sm font-medium" data-src="${issue.imageData}">View</button>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                ${actionButton}
+            </td>
+        `;
+        tableBody.appendChild(row);
+    });
+
+    // --- Modal & Action Handlers ---
+    const imageModal = document.getElementById('image-modal');
     const modalImage = document.getElementById('modal-image');
     const modalCloseBtn = document.getElementById('modal-close-btn');
 
@@ -195,69 +291,10 @@ function initImageModal() {
         if (e.target === imageModal) closeModal();
     });
 
-    // Listen for clicks on the body, delegating to image buttons
-    document.body.addEventListener('click', (e) => {
-        if (e.target.classList.contains('view-image-btn') || e.target.classList.contains('explore-image-thumb')) {
+    tableBody.addEventListener('click', (e) => {
+        if (e.target.classList.contains('view-image-btn')) {
             openModal(e.target.dataset.src);
         }
-    });
-}
-
-
-// --- Page Initializers ---
-
-/**
- * Sets up the User Dashboard page.
- */
-function initUserDashboard() {
-    // The modal logic is now shared
-}
-
-/**
- * Sets up the "My Reports" page.
- */
-function initMyReports() {
-    const tableBody = document.getElementById('reports-tbody');
-    const noReportsMsg = document.getElementById('no-reports-message');
-    const reports = getReports();
-
-    if (reports.length === 0) {
-        noReportsMsg.classList.remove('hidden');
-        return;
-    }
-
-    tableBody.innerHTML = ''; // Clear table
-    reports.sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt)); // Sort newest first
-
-    reports.forEach(issue => {
-        const row = document.createElement('tr');
-        const statusClasses = `px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClass(issue.status)}`;
-        const submittedDate = new Date(issue.submittedAt).toLocaleDateString('en-IN');
-        
-        let actionButton = '';
-        if (issue.status === 'Resolved') {
-            actionButton = `<button class="reopen-btn text-blue-600 hover:text-blue-800 hover:underline text-sm font-medium" data-id="${issue.id}">Reopen</button>`;
-        }
-
-        row.innerHTML = `
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${submittedDate}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${issue.category}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${issue.location}</td>
-            <td class="px-6 py-4 whitespace-nowrap">
-                <span class="${statusClasses}">${issue.status}</span>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                <button class="view-image-btn text-blue-600 hover:text-blue-800 hover:underline text-sm font-medium" data-src="${issue.imageData}">View</button>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                ${actionButton}
-            </td>
-        `;
-        tableBody.appendChild(row);
-    });
-
-    // Reopen button handler
-    tableBody.addEventListener('click', (e) => {
         if (e.target.classList.contains('reopen-btn')) {
             const reportId = e.target.dataset.id;
             updateReportStatus(reportId, 'Pending');
@@ -265,80 +302,6 @@ function initMyReports() {
         }
     });
 }
-
-/**
- * Sets up the "Explore Issues" page.
- */
-function initExplorePage() {
-    const pendingList = document.getElementById('pending-list');
-    const inProgressList = document.getElementById('in-progress-list');
-    const resolvedList = document.getElementById('resolved-list');
-
-    const pendingEmpty = document.getElementById('pending-empty');
-    const inProgressEmpty = document.getElementById('in-progress-empty');
-    const resolvedEmpty = document.getElementById('resolved-empty');
-
-    const reports = getReports();
-
-    // Filter reports by status
-    const pending = reports.filter(r => r.status === 'Pending').sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
-    const inProgress = reports.filter(r => r.status === 'In Progress').sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
-    const resolved = reports.filter(r => r.status === 'Resolved').sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
-
-    /**
-     * Creates the HTML for a single report card.
-     * @param {object} report - The report object.
-     * @returns {string} HTML string for the card.
-     */
-    function createReportCard(report) {
-        const statusClasses = `px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClass(report.status)}`;
-        const submittedDate = new Date(report.submittedAt).toLocaleDateString('en-IN');
-        
-        // Truncate description
-        const description = report.description.length > 100 
-            ? report.description.substring(0, 100) + '...' 
-            : report.description;
-
-        return `
-            <div class="bg-white shadow-lg rounded-lg overflow-hidden flex flex-col">
-                <img src="${report.imageData}" alt="${report.category}" class="explore-image-thumb" data-src="${report.imageData}">
-                <div class="p-4 flex flex-col flex-grow">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-sm font-semibold text-blue-600">${report.category}</span>
-                        <span class="${statusClasses}">${report.status}</span>
-                    </div>
-                    <p class="text-lg font-semibold text-gray-800 mb-2">${report.location}</p>
-                    <p class="text-sm text-gray-600 flex-grow mb-4">${description || 'No description provided.'}</p>
-                    <div class="text-xs text-gray-500 mt-auto">
-                        Reported on: ${submittedDate}
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-
-    /**
-     * Renders a list of report cards into a container.
-     * @param {HTMLElement} container - The element to inject HTML into.
-     * @param {HTMLElement} emptyEl - The element to show if reports are empty.
-     * @param {Array} reports - The array of report objects.
-     */
-    function renderList(container, emptyEl, reports) {
-        if (reports.length === 0) {
-            emptyEl.classList.remove('hidden');
-            container.innerHTML = '';
-        } else {
-            emptyEl.classList.add('hidden');
-            container.innerHTML = reports.map(createReportCard).join('');
-        }
-    }
-
-    // Render all three lists
-    renderList(pendingList, pendingEmpty, pending);
-    renderList(inProgressList, inProgressEmpty, inProgress);
-    renderList(resolvedList, resolvedEmpty, resolved);
-}
-
 
 /**
  * Sets up the Authority Dashboard page.
@@ -381,15 +344,9 @@ function initAuthorityDashboard() {
         filteredReports.sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
 
         if (filteredReports.length === 0) {
-            // Check if the empty state element is already there
-            if (!complaintListEl.contains(emptyStateEl)) {
-                 complaintListEl.appendChild(emptyStateEl);
-            }
-            emptyStateEl.classList.remove('hidden');
+            complaintListEl.appendChild(emptyStateEl);
             return;
         }
-        
-        emptyStateEl.classList.add('hidden');
 
         filteredReports.forEach(report => {
             const card = createComplaintCard(report);
@@ -405,7 +362,7 @@ function initAuthorityDashboard() {
         const statusClasses = `px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClass(report.status)}`;
 
         card.innerHTML = `
-            <div class="flex items-center justify-between flex-wrap gap-2">
+            <div class="flex items-center justify-between">
                 <div class="flex items-center gap-x-3">
                     <span class="font-semibold text-gray-800">${report.category}</span>
                     <span class="${statusClasses}">${report.status}</span>
@@ -417,14 +374,20 @@ function initAuthorityDashboard() {
             
             <p class="mt-4 text-gray-700">${report.description || 'No description provided.'}</p>
             
-            <a href="${report.imageData}" target="_blank" rel="noopener noreferrer" class="mt-4 inline-block">
-                <img src="${report.imageData}" alt="Evidence" class="max-w-xs w-full sm:w-64 rounded-lg shadow-md cursor-pointer transition-transform hover:scale-105">
+            <a href="${report.imageData}" target="_blank" rel="noopener noreferrer">
+                <img src="${report.imageData}" alt="Evidence" style="width: 200px; margin-top: 10px; border-radius: 8px; cursor: pointer;">
             </a>
             
-            <div class="mt-4 flex items-center justify-between flex-wrap gap-4">
+            <div class="mt-4 flex items-center justify-between">
                 <div class="text-sm text-gray-600">
                     <p><strong>Location:</strong> ${report.location || 'Not specified'}</p>
-                </div>
+                    
+                    ${report.geolocation && report.geolocation.lat ? `
+                        <a href="https://www.google.com/maps?q=${report.geolocation.lat},${report.geolocation.lon}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline text-sm font-medium mt-1 inline-block">
+                            View on Map
+                        </a>`
+                    : ''}
+                    </div>
                 
                 <div class="flex-shrink-0 space-x-2">
                     ${report.status === 'Pending' ? `
@@ -487,7 +450,6 @@ function initAuthorityDashboard() {
     renderComplaintList();
 }
 
-
 /**
  * Sets up common functionality, like logout.
  */
@@ -498,12 +460,9 @@ function initCommon() {
             // We just clear the userType. We'll leave the reports
             // so the "authority" can see them.
             localStorage.removeItem('userType');
-            window.location.href = 'index.html';
+            window.location.href = 'index.html'; // <-- UPDATED
         });
     });
-
-    // Initialize the report modal on any page that has it
-    initReportModal();
 }
 
 // --- Main Execution ---
@@ -514,14 +473,10 @@ document.addEventListener('DOMContentLoaded', () => {
         initUserDashboard();
     } else if (page === 'my-reports') {
         initMyReports();
-        initImageModal(); // Add image modal listener
-    } else if (page === 'explore') {
-        initExplorePage();
-        initImageModal(); // Add image modal listener
     } else if (page === 'authority-dashboard') {
         initAuthorityDashboard();
     }
 
-    // Run common setup on all pages (handles logout and report modal)
+    // Run common setup on all pages
     initCommon();
 });
