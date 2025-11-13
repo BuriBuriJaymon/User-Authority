@@ -93,13 +93,12 @@ function startHeroSlideshow() {
     const slideshowContainer = document.getElementById('hero-slideshow');
     if (!slideshowContainer) return; // Guard clause if not on the right page
 
-    // --- UPDATED: Corrected images for Delhi & Greater Noida ---
+    // --- UPDATED: Use user's uploaded images and remove Buddh Circuit ---
     const slidesData = [
-        { img: 'https://images.pexels.com/photos/3584437/pexels-photo-3584437.jpeg', city: 'India Gate, Delhi' },
-        { img: 'https://images.pexels.com/photos/16036137/pexels-photo-16036137/free-photo-of-buddh-international-circuit.jpeg', city: 'Buddh International Circuit, Greater Noida' },
-        { img: 'https://images.pexels.com/photos/10174955/pexels-photo-10174955.jpeg', city: 'Lotus Temple, Delhi' },
-        { img: 'https://images.pexels.com/photos/10795551/pexels-photo-10795551.jpeg', city: 'Greater Noida Expressway' },
-        { img: 'https://images.pexels.com/photos/3889694/pexels-photo-3889694.jpeg', city: 'Humayun\'s Tomb, Delhi' }
+        { img: 'IndiaGate.jpg', city: 'India Gate, Delhi' },
+        { img: 'Lotus Temple.jpg', city: 'Lotus Temple, Delhi' },
+        { img: 'Greater Noida Expressway.webp', city: 'Greater Noida Expressway' },
+        { img: 'Humayun\'s Tomb.jpg', city: 'Humayun\'s Tomb, Delhi' }
     ];
     // --- End of Update ---
 
