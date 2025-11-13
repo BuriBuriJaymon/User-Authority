@@ -385,7 +385,7 @@ function initCommon() {
             // We just clear the userType. We'll leave the reports
             // so the "authority" can see them.
             localStorage.removeItem('userType');
-            window.location.href = 'login.html';
+            window.location.href = 'index.html'; // <-- UPDATED
         });
     });
 }
