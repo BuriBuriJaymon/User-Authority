@@ -30,7 +30,6 @@
 <body class="h-full" data-page="authority-dashboard">
 
     <div class="min-h-full">
-        <!-- Sidebar -->
         <nav class="sidebar fixed inset-y-0 left-0 z-30 flex w-64 flex-col overflow-y-auto bg-emerald-500 px-6 pb-4 md:flex md:transform-none">
             <div class="flex h-16 shrink-0 items-center">
                 <h1 class="text-2xl font-bold text-white">Fix YourCity</h1>
@@ -40,28 +39,24 @@
                     <ul role="list" class="-mx-2 space-y-1">
                         <li>
                             <a class="sidebar-link active" data-filter="All Reports">
-                                <!-- SVG for Dashboard -->
                                 <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.44 1.15-.44 1.59 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
                                 Dashboard
                             </a>
                         </li>
                         <li>
                             <a class="sidebar-link" data-filter="Pending">
-                                <!-- SVG for Pending -->
                                 <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                 No Progress (Pending)
                             </a>
                         </li>
                         <li>
                             <a class="sidebar-link" data-filter="In Progress">
-                                <!-- SVG for In Progress -->
                                 <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>
                                 Active (In Progress)
                             </a>
                         </li>
                         <li>
                             <a class="sidebar-link" data-filter="Resolved">
-                                <!-- SVG for Resolved -->
                                 <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                 Resolved
                             </a>
@@ -74,7 +69,7 @@
                         <li><a class="sidebar-link" data-filter="Pothole">Pothole</a></li>
                         <li><a class="sidebar-link" data-filter="Broken Streetlight">Broken Streetlight</a></li>
                         <li><a class="sidebar-link" data-filter="Garbage & Dumping">Garbage & Dumping</a></li>
-                        <li><a class="sidebar-link" data-filter="Public Nuisance">Public Nuisance</a></li>
+                        <li><a class="sidebar-link" data-filter="Public Nuisance">Public NNuisance</a></li>
                         <li><a class="sidebar-link" data-filter="Graffiti">Graffiti</a></li>
                         <li><a class="sidebar-link" data-filter="Other">Other</a></li>
                     </ul>
@@ -82,7 +77,6 @@
             </ul>
         </nav>
 
-        <!-- Main Content Area -->
         <div class="md:pl-64">
             <div class="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
                 <button type="button" class="text-gray-700 md:hidden" id="menu-toggle">
@@ -91,8 +85,7 @@
                 </button>
                 <div class="flex-1 text-sm font-medium leading-6 text-gray-900" id="header-title">Dashboard</div>
                 <div>
-                    <a href="login.html" id="logout-btn" class="rounded-md bg-red-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-red-500">
-                        Log out
+                    <a href="index.html" id="logout-btn" class="rounded-md bg-red-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-red-500"> Log out
                     </a>
                 </div>
             </div>
@@ -111,6 +104,7 @@
                                         <dl>
                                             <dt class="truncate text-sm font-medium text-gray-500">Total Reports</dt>
                                             <dd class="text-3xl font-semibold tracking-tight text-gray-900" id="stat-total">0</dd>
+
                                         </dl>
                                     </div>
                                 </div>
@@ -155,8 +149,7 @@
                                 <div id="empty-state" class="text-center text-gray-500 py-10">
                                     <p>No reports found. Submit one from the user dashboard *in this browser* to see it here.</p>
                                 </div>
-                                <!-- Complaint cards will be injected here by app.js -->
-                            </div>
+                                </div>
                         </div>
                     </div>
                 </div>
