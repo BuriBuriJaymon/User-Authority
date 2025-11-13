@@ -140,7 +140,7 @@ function startHeroSlideshow() {
 function initUserDashboard() {
     const modal = document.getElementById('report-modal');
     const form = document.getElementById('report-form');
-    const openModalBtns = document.querySelectorAll('.open-report-modal');
+    // const openModalBtns = document.querySelectorAll('.open-report-modal'); // Moved to initCommon
     const closeModalBtn = document.getElementById('close-modal-btn');
     const submitBtn = document.getElementById('submit-report-btn');
     const formMessage = document.getElementById('form-message');
@@ -151,7 +151,7 @@ function initUserDashboard() {
     let capturedCoords = null;
     // ----------------------------
 
-    const openModal = () => modal.classList.remove('hidden');
+    // const openModal = () => modal.classList.remove('hidden'); // Moved to initCommon
     const closeModal = () => {
         modal.classList.add('hidden');
         // Clear any previous messages
@@ -162,7 +162,7 @@ function initUserDashboard() {
         }
     };
 
-    openModalBtns.forEach(btn => btn.addEventListener('click', openModal));
+    // openModalBtns.forEach(btn => btn.addEventListener('click', openModal)); // Moved to initCommon
     closeModalBtn.addEventListener('click', closeModal);
     modal.addEventListener('click', (e) => {
         if (e.target === modal) closeModal();
@@ -180,7 +180,7 @@ function initUserDashboard() {
             getLocationBtn.disabled = true;
             getLocationBtn.textContent = 'Fetching...';
             locationFeedback.textContent = 'Requesting location permission...';
-            locationFoodback.className = 'text-sm text-blue-600 mt-2';
+            locationFeedback.className = 'text-sm text-blue-600 mt-2'; // Use className for consistency
 
             navigator.geolocation.getCurrentPosition(
                 (position) => {
@@ -290,8 +290,8 @@ function initMyReports() {
     
     // Guard clauses for elements
     if (!tableBody || !noReportsMsg) {
-        console.error("Could not find 'My Reports' table elements.");
-        return;
+        // console.error("Could not find 'My Reports' table elements.");
+        return; // Silently return if not on the page
     }
     
     const reports = getReports();
@@ -315,7 +315,7 @@ function initMyReports() {
         // --- Create Location HTML with Map Link ---
         let locationHtml = issue.location;
         if (issue.geolocation && issue.geolocation.lat) {
-            locationHtml += ` <a href="http://googleusercontent.com/maps/google.com/0{issue.geolocation.lat},${issue.geolocation.lon}" target="_blank" class="text-blue-600 hover:underline text-xs block">(View Map)</a>`;
+            locationHtml += ` <a href="https://maps.google.com/?q=${issue.geolocation.lat},${issue.geolocation.lon}" target="_blank" class="text-blue-600 hover:underline text-xs block">(View Map)</a>`;
         }
         // ------------------------------------------
 
@@ -326,7 +326,7 @@ function initMyReports() {
             <td class="px-6 py-4 whitespace-nowrap">
                 <span class="${statusClasses}">${issue.status}</span>
             </td>
-            <td classpx-6 py-4 whitespace-nowrap text-sm font-medium">
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <button class="view-image-btn text-blue-600 hover:text-blue-800 hover:underline text-sm font-medium" data-src="${issue.imageData}">View</button>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -340,6 +340,9 @@ function initMyReports() {
     const imageModal = document.getElementById('image-modal');
     const modalImage = document.getElementById('modal-image');
     const modalCloseBtn = document.getElementById('modal-close-btn');
+
+    // Guard clause for modal elements
+    if (!imageModal || !modalImage || !modalCloseBtn) return;
 
     const openModal = (imageUrl) => {
         modalImage.src = imageUrl;
@@ -371,13 +374,16 @@ function initMyReports() {
  * Sets up the Authority Dashboard page.
  */
 function initAuthorityDashboard() {
+    // Guard clause: check if we are on the right page
+    const complaintListEl = document.getElementById('complaint-list');
+    if (!complaintListEl) return;
+
     let allReports = getReports();
     let currentFilter = 'All Reports';
 
     const statTotalEl = document.getElementById('stat-total');
     const statPendingEl = document.getElementById('stat-pending');
     const statResolvedEl = document.getElementById('stat-resolved');
-    const complaintListEl = document.getElementById('complaint-list');
     const headerTitleEl = document.getElementById('header-title');
     const complaintListTitleEl = document.getElementById('complaint-list-title');
     const sidebarLinks = document.querySelectorAll('.sidebar-link');
@@ -454,7 +460,7 @@ function initAuthorityDashboard() {
                     <p><strong>Location:</strong> ${report.location || 'Not specified'}</p>
                     
                     ${report.geolocation && report.geolocation.lat ? `
-                        <a href="http://googleusercontent.com/maps/google.com/0{report.geolocation.lat},${report.geolocation.lon}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline text-sm font-medium mt-1 inline-block">
+                        <a href="https://maps.google.com/?q=${report.geolocation.lat},${report.geolocation.lon}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline text-sm font-medium mt-1 inline-block">
                             View on Map
                         </a>`
                     : ''}
@@ -496,7 +502,7 @@ function initAuthorityDashboard() {
         
         renderComplaintList();
         
-        if (window.innerWidth < 768) {
+        if (window.innerWidth < 768 && sidebar) { // Added check for sidebar
             sidebar.classList.remove('open');
         }
     }
@@ -513,7 +519,9 @@ function initAuthorityDashboard() {
         }
     });
 
-    menuToggle.addEventListener('click', () => sidebar.classList.toggle('open'));
+    if (menuToggle && sidebar) { // Added checks
+        menuToggle.addEventListener('click', () => sidebar.classList.toggle('open'));
+    }
     sidebarLinks.forEach(link => link.addEventListener('click', handleFilterClick));
 
     // --- Initial Load ---
@@ -525,10 +533,13 @@ function initAuthorityDashboard() {
  * Sets up the "Explore Issues" page.
  */
 function initExplore() {
+    // Guard clause: check if we are on the right page
+    const pendingList = document.getElementById('pending-list');
+    if (!pendingList) return;
+
     const reports = getReports();
 
     // Get list containers
-    const pendingList = document.getElementById('pending-list');
     const inProgressList = document.getElementById('in-progress-list');
     const resolvedList = document.getElementById('resolved-list');
 
@@ -538,7 +549,7 @@ function initExplore() {
     const resolvedEmpty = document.getElementById('resolved-empty');
 
     // Guard clauses for elements
-    if (!pendingList || !inProgressList || !resolvedList || !pendingEmpty || !inProgressEmpty || !resolvedEmpty) {
+    if (!inProgressList || !resolvedList || !pendingEmpty || !inProgressEmpty || !resolvedEmpty) {
         console.error('Could not find all elements on Explore page.');
         return;
     }
@@ -556,7 +567,7 @@ function initExplore() {
         
         let locationHtml = report.location;
         if (report.geolocation && report.geolocation.lat) {
-            locationHtml += ` <a href="http://googleusercontent.com/maps/google.com/0{report.geolocation.lat},${report.geolocation.lon}" target="_blank" class="text-blue-600 hover:underline text-xs block">(View Map)</a>`;
+            locationHtml += ` <a href="https://maps.google.com/?q=${report.geolocation.lat},${report.geolocation.lon}" target="_blank" class="text-blue-600 hover:underline text-xs block">(View Map)</a>`;
         }
 
         card.innerHTML = `
@@ -602,8 +613,8 @@ function initExplore() {
 
     // Ensure modal elements exist
     if (!imageModal || !modalImage || !modalCloseBtn) {
-        console.error('Could not find image modal elements on Explore page.');
-        return;
+        // console.error('Could not find image modal elements on Explore page.');
+        return; // Silently return
     }
 
     const openModal = (imageUrl) => {
@@ -633,15 +644,29 @@ function initExplore() {
  * Sets up common functionality, like logout and modal opening.
  */
 function initCommon() {
-    // Logout functionality
-    document.querySelectorAll('#logout-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            // We just clear the userType. We'll leave the reports
-            // so the "authority" can see them.
-            localStorage.removeItem('userType');
-            window.location.href = 'index.html';
+    // --- NEW: Mobile Menu Toggle ---
+    const menuBtn = document.getElementById('mobile-menu-btn');
+    const menu = document.getElementById('mobile-menu');
+    
+    if (menuBtn && menu) {
+        menuBtn.addEventListener('click', () => {
+            menu.classList.toggle('hidden');
         });
+    }
+    // --- End of New Code ---
+
+
+    // Logout functionality
+    document.querySelectorAll('#logout-btn, #logout-btn-mobile').forEach(btn => {
+        if (btn) { // Add check in case mobile button isn't on page
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                // We just clear the userType. We'll leave the reports
+                // so the "authority" can see them.
+                localStorage.removeItem('userType');
+                window.location.href = 'index.html';
+            });
+        }
     });
 
     // Common modal functionality (for nav links)
@@ -673,13 +698,14 @@ function initCommon() {
 document.addEventListener('DOMContentLoaded', () => {
     const page = document.body.dataset.page;
     
+    // Run page-specific initializers
     if (page === 'user-dashboard') {
         initUserDashboard();
     } else if (page === 'my-reports') {
         initMyReports();
     } else if (page === 'authority-dashboard') {
         initAuthorityDashboard();
-    } else if (page === 'explore') { // <-- FIX: Added explore page init
+    } else if (page === 'explore') {
         initExplore();
     }
 
