@@ -93,13 +93,13 @@ function startHeroSlideshow() {
     const slideshowContainer = document.getElementById('hero-slideshow');
     if (!slideshowContainer) return; // Guard clause if not on the right page
 
-    // --- UPDATED: New aesthetic images for Delhi & Greater Noida ---
+    // --- UPDATED: Corrected images for Delhi & Greater Noida ---
     const slidesData = [
-        { img: 'https://images.pexels.com/photos/792026/pexels-photo-792026.jpeg', city: 'India Gate, Delhi' },
-        { img: 'https://images.pexels.com/photos/16036137/pexels-photo-16036137/free-photo-of-buddh-international-circuit.jpeg', city: 'Greater Noida' },
-        { img: 'https://images.pexels.com/photos/931007/pexels-photo-931007.jpeg', city: 'Lotus Temple, Delhi' },
-        { img: 'https://images.pexels.com/photos/14022262/pexels-photo-14022262.jpeg', city: 'Greater Noida Expressway' },
-        { img: 'https://images.pexels.com/photos/1117493/pexels-photo-1117493.jpeg', city: 'Humayun\'s Tomb, Delhi' }
+        { img: 'https://images.pexels.com/photos/3584437/pexels-photo-3584437.jpeg', city: 'India Gate, Delhi' },
+        { img: 'https://images.pexels.com/photos/16036137/pexels-photo-16036137/free-photo-of-buddh-international-circuit.jpeg', city: 'Buddh International Circuit, Greater Noida' },
+        { img: 'https://images.pexels.com/photos/10174955/pexels-photo-10174955.jpeg', city: 'Lotus Temple, Delhi' },
+        { img: 'https://images.pexels.com/photos/10795551/pexels-photo-10795551.jpeg', city: 'Greater Noida Expressway' },
+        { img: 'https://images.pexels.com/photos/3889694/pexels-photo-3889694.jpeg', city: 'Humayun\'s Tomb, Delhi' }
     ];
     // --- End of Update ---
 
